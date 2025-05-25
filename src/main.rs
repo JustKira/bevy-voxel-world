@@ -33,7 +33,8 @@ fn setup(
             base_color_texture: Some(uv_texture),
             ..default()
         })),
-        Transform::from_xyz(0.0, 1.0, 0.0),
+        // MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
+        Transform::from_xyz(0.0, 0.0, 0.0),
     ));
 
     commands.spawn((
@@ -57,10 +58,11 @@ fn create_mesh_handle() -> Mesh {
             [1.0, 1.0, 0.0],
         ],
     )
-    .with_computed_flat_normals()
     .with_inserted_attribute(
         Mesh::ATTRIBUTE_UV_0,
-        vec![[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]],
+        vec![[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [0.0, 0.0]],
     )
-    .with_inserted_indices(Indices::U32(vec![0, 1, 2, 1, 3, 2]))
+    .with_inserted_indices(Indices::U32(vec![2, 1, 0, 2, 3, 1]))
+    .with_duplicated_vertices()
+    .with_computed_flat_normals()
 }
