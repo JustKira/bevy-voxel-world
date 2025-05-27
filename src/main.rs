@@ -1,18 +1,20 @@
 use bevy::{
+    color::palettes::{css::WHITE, tailwind::RED_500},
+    pbr::wireframe::{WireframeConfig, WireframePlugin},
     prelude::*,
-    render::{
-        mesh::{Indices, VertexAttributeValues},
-        render_asset::RenderAssetUsages,
-        render_resource::PrimitiveTopology,
-    },
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins((DefaultPlugins, WireframePlugin::default()))
         .add_systems(Startup, setup)
         .add_plugins(PanOrbitCameraPlugin)
+        .insert_resource(WireframeConfig {
+            global: true,
+            default_color: RED_500.into(),
+        })
         .run();
 }
 
@@ -37,6 +39,12 @@ fn setup(
         Transform::from_xyz(0.0, 0.0, 0.0),
     ));
 
+    // commands.spawn((
+    //     Mesh3d(meshes.add(Cuboid::new(1.0, 1.0, 1.0))),
+    //     MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
+    //     Transform::from_xyz(0.0, 0.5, 0.0),
+    // ));
+
     commands.spawn((
         Transform::from_translation(Vec3::new(0.0, 1.5, 5.0)),
         PanOrbitCamera::default(),
@@ -52,17 +60,24 @@ fn create_mesh_handle() -> Mesh {
     .with_inserted_attribute(
         Mesh::ATTRIBUTE_POSITION,
         vec![
-            [-1.0, -1.0, 0.0],
-            [-1.0, 1.0, 0.0],
-            [1.0, -1.0, 0.0],
-            [1.0, 1.0, 0.0],
+            // Back face (Z = 0)
+            [0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0], // 1: bottom-right-back
+            [1.0, 0.0, 1.0], // 2: top-right-back
+            [0.0, 0.0, 1.0], // 3: top-left-back
         ],
     )
     .with_inserted_attribute(
         Mesh::ATTRIBUTE_UV_0,
-        vec![[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [0.0, 0.0]],
+        vec![
+            // Front face - corrected UV (flipped vertically)
+            [0.0, 1.0],
+            [1.0, 1.0],
+            [1.0, 0.0],
+            [0.0, 0.0],
+        ],
     )
-    .with_inserted_indices(Indices::U32(vec![2, 1, 0, 2, 3, 1]))
+    .with_inserted_indices(Indices::U32(vec![0, 1, 2, 2, 3, 0]))
     .with_duplicated_vertices()
     .with_computed_flat_normals()
 }
