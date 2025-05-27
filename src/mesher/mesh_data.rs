@@ -45,19 +45,9 @@ fn create_quad(indices: &mut Vec<u32>, vertices: &mut Vec<[f32; 3]>, side: usize
     indices.push(vertices_count + 0);
     indices.push(vertices_count + 3);
 
-    println!(
-        "Triangles (last 6 points): {:?}",
-        &indices[indices.len().saturating_sub(6)..]
-    );
-    println!("Vertices Len {}", vertices.len());
-
     for vertex in 0..4 as usize {
         let index = QUAD_VERTICES[side][vertex];
         let position = VOXEL_VERTICES[QUAD_VERTICES[side][vertex] as usize];
-        println!(
-            "Side Vert({}) , Index({}) : Position {:#?}",
-            vertex, index, position
-        );
         vertices.push(position);
     }
 }
