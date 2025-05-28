@@ -4,6 +4,8 @@ use bevy::{
     render::mesh::{Indices, Mesh, PrimitiveTopology},
 };
 
+use super::noise::NoiseMesher;
+
 // Check Bevy Coordinate System
 // https://bevy-cheatbook.github.io/fundamentals/coords.html
 //
@@ -86,21 +88,26 @@ pub fn create_mesh() -> Mesh {
     .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, normals)
 }
 
-pub fn create_chunk(x_size: u32, y_size: u32, z_size: u32) -> Mesh {
+pub fn create_chunk(noise_mesher: &NoiseMesher, x_size: u32, y_size: u32, z_size: u32) -> Mesh {
     let mut indices: Vec<u32> = Vec::new();
     let mut vertices: Vec<[f32; 3]> = Vec::new();
     let mut normals: Vec<[f32; 3]> = Vec::new();
+
     for x in 0..x_size {
         for y in 0..y_size {
             for z in 0..z_size {
                 for side in 0..6 {
-                    create_quad(
-                        &mut indices,
-                        &mut vertices,
-                        &mut normals,
-                        side,
-                        Vec3::new(x as f32, y as f32, z as f32),
-                    );
+                    let density = noise_mesher.get_noise_3d(x as f32, y as f32, z as f32);
+
+                    if density > 0.0 {
+                        create_quad(
+                            &mut indices,
+                            &mut vertices,
+                            &mut normals,
+                            side,
+                            Vec3::new(x as f32, y as f32, z as f32),
+                        );
+                    }
                 }
             }
         }
